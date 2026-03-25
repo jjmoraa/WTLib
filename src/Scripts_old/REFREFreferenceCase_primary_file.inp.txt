@@ -1,0 +1,114 @@
+--------- BEAMDYN with OpenFAST INPUT FILE -------------------------------------------
+Isotropic beam
+---------------------- SIMULATION CONTROL --------------------------------------
+True          Echo             - Echo input data to "<RootName>.ech"? (flag)
+False         QuasiStaticInit  - Use quasi-static pre-conditioning with centripetal accelerations in initialization? (flag) [dynamic solve only]
+          0   rhoinf           - Numerical damping parameter for generalized-alpha integrator
+          2   quadrature       - Quadrature method: 1=Gaussian; 2=Trapezoidal (switch)
+          1   refine           - Refinement factor for trapezoidal quadrature (-) [DEFAULT = 1; used only when quadrature=2]
+"DEFAULT"     n_fact           - Factorization frequency for the Jacobian in N-R iteration(-) [DEFAULT = 5]
+"DEFAULT"     DTBeam           - Time step size (s)
+"DEFAULT"     load_retries     - Number of factored load retries before quitting the simulation [DEFAULT = 20]
+1000          NRMax            - Max number of iterations in Newton-Raphson algorithm (-) [DEFAULT = 10]
+"DEFAULT"     stop_tol         - Tolerance for stopping criterion (-) [DEFAULT = 1E-5]
+"DEFAULT"     tngt_stf_fd      - Use finite differenced tangent stiffness matrix? (flag)
+"DEFAULT"     tngt_stf_comp    - Compare analytical finite differenced tangent stiffness matrix? (flag)
+"DEFAULT"     tngt_stf_pert    - Perturbation size for finite differencing (-) [DEFAULT = 1E-6]
+"DEFAULT"     tngt_stf_difftol - Maximum allowable relative difference between analytical and fd tangent stiffness (-); [DEFAULT = 0.1]
+True          RotStates        - Orient states in the rotating frame during linearization? (flag) [used only when linearizing] 
+---------------------- GEOMETRY PARAMETER --------------------------------------
+          1   member_total    - Total number of members (-)
+          51   kp_total        - Total number of key points (-) [must be at least 3]
+       1        51                 - Member number; Number of key points in this member
+   kp_xr         kp_yr         kp_zr        initial_twist
+   (m)            (m)          (m)            (deg)
+0.000000E+00  0.000000E+00  0.000000E+00  1.559000E+01
+0.000000E+00  0.000000E+00  2.339999E+00  1.559000E+01
+0.000000E+00  0.000000E+00  4.679997E+00  1.542000E+01
+0.000000E+00  0.000000E+00  7.019996E+00  1.498000E+01
+0.000000E+00  0.000000E+00  9.359995E+00  1.432000E+01
+0.000000E+00  0.000000E+00  1.169999E+01  1.349000E+01
+0.000000E+00  0.000000E+00  1.403999E+01  1.254000E+01
+0.000000E+00  0.000000E+00  1.637999E+01  1.154000E+01
+0.000000E+00  0.000000E+00  1.871999E+01  1.053000E+01
+0.000000E+00  0.000000E+00  2.105999E+01  9.570000E+00
+0.000000E+00  0.000000E+00  2.339999E+01  8.710000E+00
+0.000000E+00  0.000000E+00  2.573998E+01  7.980000E+00
+0.000000E+00  0.000000E+00  2.807998E+01  7.340000E+00
+0.000000E+00  0.000000E+00  3.041998E+01  6.720000E+00
+0.000000E+00  0.000000E+00  3.275998E+01  6.100000E+00
+0.000000E+00  0.000000E+00  3.509998E+01  5.520000E+00
+0.000000E+00  0.000000E+00  3.743998E+01  4.970000E+00
+0.000000E+00  0.000000E+00  3.977998E+01  4.460000E+00
+0.000000E+00  0.000000E+00  4.211998E+01  4.000000E+00
+0.000000E+00  0.000000E+00  4.445997E+01  3.590000E+00
+0.000000E+00  0.000000E+00  4.679997E+01  3.220000E+00
+0.000000E+00  0.000000E+00  4.913997E+01  2.870000E+00
+0.000000E+00  0.000000E+00  5.147997E+01  2.550000E+00
+0.000000E+00  0.000000E+00  5.381997E+01  2.250000E+00
+0.000000E+00  0.000000E+00  5.615997E+01  1.960000E+00
+0.000000E+00  0.000000E+00  5.849997E+01  1.690000E+00
+0.000000E+00  0.000000E+00  6.083996E+01  1.430000E+00
+0.000000E+00  0.000000E+00  6.317996E+01  1.190000E+00
+0.000000E+00  0.000000E+00  6.551996E+01  9.700000E-01
+0.000000E+00  0.000000E+00  6.785996E+01  7.600000E-01
+0.000000E+00  0.000000E+00  7.019996E+01  5.600000E-01
+0.000000E+00  0.000000E+00  7.253996E+01  3.600000E-01
+0.000000E+00  0.000000E+00  7.487996E+01  1.700000E-01
+0.000000E+00  0.000000E+00  7.721995E+01  -3.000000E-02
+0.000000E+00  0.000000E+00  7.955995E+01  -2.400000E-01
+0.000000E+00  0.000000E+00  8.189995E+01  -4.800000E-01
+0.000000E+00  0.000000E+00  8.423995E+01  -7.700000E-01
+0.000000E+00  0.000000E+00  8.657995E+01  -1.080000E+00
+0.000000E+00  0.000000E+00  8.891995E+01  -1.400000E+00
+0.000000E+00  0.000000E+00  9.125995E+01  -1.680000E+00
+0.000000E+00  0.000000E+00  9.359995E+01  -1.930000E+00
+0.000000E+00  0.000000E+00  9.593994E+01  -2.110000E+00
+0.000000E+00  0.000000E+00  9.827994E+01  -2.170000E+00
+0.000000E+00  0.000000E+00  1.006199E+02  -2.180000E+00
+0.000000E+00  0.000000E+00  1.029599E+02  -2.150000E+00
+0.000000E+00  0.000000E+00  1.052999E+02  -2.100000E+00
+0.000000E+00  0.000000E+00  1.076399E+02  -2.010000E+00
+0.000000E+00  0.000000E+00  1.099799E+02  -1.890000E+00
+0.000000E+00  0.000000E+00  1.123199E+02  -1.720000E+00
+0.000000E+00  0.000000E+00  1.146599E+02  -1.500000E+00
+0.000000E+00  0.000000E+00  1.169999E+02  -1.240000E+00
+---------------------- MESH PARAMETER ------------------------------------------
+          5   order_elem     - Order of interpolation (basis) function (-)
+---------------------- MATERIAL PARAMETER --------------------------------------
+"referenceCase_blade_props_file.inp"    BldFile - Name of file containing properties for blade (quoted string)
+---------------------- PITCH ACTUATOR PARAMETERS -------------------------------
+False         UsePitchAct - Whether a pitch actuator should be used (flag)
+          0   PitchJ      - Pitch actuator inertia (kg-m^2) [used only when UsePitchAct is true]
+          0   PitchK      - Pitch actuator stiffness (kg-m^2/s^2) [used only when UsePitchAct is true]
+          0   PitchC      - Pitch actuator damping (kg-m^2/s) [used only when UsePitchAct is true]
+---------------------- OUTPUTS -------------------------------------------------
+True          SumPrint       - Print summary data to "<RootName>.sum" (flag)
+"ES16.8E2"    OutFmt          - Format used for text tabular output, excluding the time channel.
+0            NNodeOuts      - Number of nodes to output to file [0 - 9] (-)
+          OutNd          - Nodes whose values will be output  (-)
+          OutList        - The next line(s) contains a list of output parameters. See OutListParameters.xlsx for a listing of available output channels, (-)
+END of OutList section (the word "END" must appear in the first 3 columns of the last OutList line)
+---------------------- NODE OUTPUTS --------------------------------------------
+         50   BldNd_BlOutNd   - Blade nodes on each blade (currently unused)
+              OutList     - The next line(s) contains a list of output parameters.  See OutListParameters.xlsx, BeamDyn_Nodes tab for a listing of available output channels, (-)
+"FxL"       - Sectional force resultants at each node expressed in l    l: a floating coordinate system local to the deflected beam    (N)
+"FyL"       - Sectional force resultants at each node expressed in l    l: a floating coordinate system local to the deflected beam    (N)
+"FzL"       - Sectional force resultants at each node expressed in l    l: a floating coordinate system local to the deflected beam    (N)
+"MxL"       - Sectional moment resultants at each node expressed in l    l: a floating coordinate system local to the deflected beam    (N-m)
+"MyL"       - Sectional moment resultants at each node expressed in l    l: a floating coordinate system local to the deflected beam    (N-m)
+"MzL"       - Sectional moment resultants at each node expressed in l    l: a floating coordinate system local to the deflected beam    (N-m)
+"Fxr"       - Sectional force resultants at each node expressed in r    r: a floating reference coordinate system fixed to the root of the moving beam; when coupled to FAST for blades, this is equivalent to the IEC blade (b) coordinate system    (N)
+"Fyr"       - Sectional force resultants at each node expressed in r    r: a floating reference coordinate system fixed to the root of the moving beam; when coupled to FAST for blades, this is equivalent to the IEC blade (b) coordinate system    (N)
+"Fzr"       - Sectional force resultants at each node expressed in r    r: a floating reference coordinate system fixed to the root of the moving beam; when coupled to FAST for blades, this is equivalent to the IEC blade (b) coordinate system    (N)
+"Mxr"       - Sectional moment resultants at each node expressed in r    r: a floating reference coordinate system fixed to the root of the moving beam; when coupled to FAST for blades, this is equivalent to the IEC blade (b) coordinate system    (N-m)
+"Myr"       - Sectional moment resultants at each node expressed in r    r: a floating reference coordinate system fixed to the root of the moving beam; when coupled to FAST for blades, this is equivalent to the IEC blade (b) coordinate system    (N-m)
+"Mzr"       - Sectional moment resultants at each node expressed in r    r: a floating reference coordinate system fixed to the root of the moving beam; when coupled to FAST for blades, this is equivalent to the IEC blade (b) coordinate system    (N-m)
+"TDxr"      - Sectional translational deflection (relative to the undeflected position) at each node expressed in r    r: a floating reference coordinate system fixed to the root of the moving beam; when coupled to FAST for blades, this is equivalent to the IEC blade (b) coordinate system    (m)
+"TDyr"      - Sectional translational deflection (relative to the undeflected position) at each node expressed in r    r: a floating reference coordinate system fixed to the root of the moving beam; when coupled to FAST for blades, this is equivalent to the IEC blade (b) coordinate system    (m)
+"TDzr"      - Sectional translational deflection (relative to the undeflected position) at each node expressed in r    r: a floating reference coordinate system fixed to the root of the moving beam; when coupled to FAST for blades, this is equivalent to the IEC blade (b) coordinate system    (m)
+"RDxr"      - Sectional angular/rotational deflection Wiener-Milenkovic parameter (relative to the undeflected orientation) at each node expressed in r    r: a floating reference coordinate system fixed to the root of the moving beam; when coupled to FAST for blades, this is equivalent to the IEC blade (b) coordinate system    (-)
+"RDyr"      - Sectional angular/rotational deflection Wiener-Milenkovic parameter (relative to the undeflected orientation) at each node expressed in r    r: a floating reference coordinate system fixed to the root of the moving beam; when coupled to FAST for blades, this is equivalent to the IEC blade (b) coordinate system    (-)
+"RDzr"      - Sectional angular/rotational deflection Wiener-Milenkovic parameter (relative to the undeflected orientation) at each node expressed in r    r: a floating reference coordinate system fixed to the root of the moving beam; when coupled to FAST for blades, this is equivalent to the IEC blade (b) coordinate system    (-)
+END of input file (the word "END" must appear in the first 3 columns of this last OutList line)
+---------------------------------------------------------------------------------------
