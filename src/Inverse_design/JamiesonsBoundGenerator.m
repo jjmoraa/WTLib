@@ -1,6 +1,6 @@
 % a-n-p curve exploration
 
-function grid_points=JamiesonsBoundGenerator(a0,n_ref,p_ref,curve,n_min,n_max,resolution)
+function [grid_points, space_heatmap]=JamiesonsBoundGenerator(a0,n_ref,p_ref,curve,n_min,n_max,resolution)
 
 addpath('C:\Users\josej\Documents\MATLAB BEM Solver\Scripts\distmesh\');
 x = 0:0.01:1;
@@ -29,19 +29,53 @@ for i = 1:num_n
     end
 end
 
-%Heatmap visualization
-figure()
+%% --- Heatmap visualization ---
+space_heatmap = figure( ...
+    'Name', 'Mean Shift Heatmap', ...
+    'NumberTitle', 'off');
 imagesc(n_vals, p_vals, mean_shift);
-colormap jet;
-colorbar;
-xlabel('n');
-ylabel('p');
-title('Mean Shift Heatmap with Contours');
+
+colormap(flipud(winter)); 
+cb = colorbar;
+cb.FontSize = 11;
+cb.Label.String = '$\mathrm{Mean\ Shift}$';
+cb.Label.Interpreter = 'latex';
+
 set(gca, 'YDir', 'normal');
 
-% Overlay contour lines to show regions with the same mean shift
+%% --- Contours ---
 hold on;
-[C, h] = contour(p_vals, n_vals, mean_shift, 'k', 'LineWidth', 2);  % No level input = auto levels
+[C, h] = contour(n_vals, p_vals, mean_shift, ...
+    'k', 'LineWidth', 1.2);
+
+clabel(C, h, ...
+    'FontSize', 10, ...
+    'Color', 'k', ...
+    'Interpreter', 'latex');
+
+%% --- Axes formatting ---
+ax = gca;
+set(ax, ...
+    'FontName', 'Times', ...
+    'FontSize', 12, ...
+    'LineWidth', 1, ...
+    'Box', 'on', ...
+    'Layer', 'top', ...
+    'TickLabelInterpreter', 'latex');
+
+xlabel('$n$', 'Interpreter','latex','FontSize',14);
+ylabel('$p$', 'Interpreter','latex','FontSize',14);
+% title('$\mathrm{Mean\ Shift\ Heatmap}$', ...
+%     'Interpreter','latex','FontSize',14);
+
+%% --- Grid ---
+grid on;
+ax.GridColor = [0.7 0.7 0.7];
+ax.GridAlpha = 0.2;
+ax.MinorGridAlpha = 0.1;
+ax.XMinorGrid = 'on';
+ax.YMinorGrid = 'on';
+
 hold off;
 
 %% separate the lines from the plot

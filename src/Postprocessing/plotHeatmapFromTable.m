@@ -1,4 +1,4 @@
-function fig = plotHeatmapFromTable(dataTable, xField, yField, zField)
+function [fig, hImg, hScatter, hContour, C] = plotHeatmapFromTable(dataTable, xField, yField, zField)
     % Extract x, y, and z data from the table
     x = dataTable.(xField);
     y = dataTable.(yField);
@@ -10,26 +10,78 @@ function fig = plotHeatmapFromTable(dataTable, xField, yField, zField)
     [Xq, Yq] = meshgrid(xUnique, yUnique);
 
     % Interpolate z values onto the structured grid
-    Zq = griddata(x, y, z, Xq, Yq, 'cubic');  % smooth transitions
+    Zq = griddata(x, y, z, Xq, Yq, 'natural');  % smooth transitions
 
-    % Plot heatmap using surf
-    fig = figure;
-    hSurf = surf(Xq, Yq, Zq, 'EdgeColor', 'none', 'FaceAlpha', 0.85); % slightly transparent
-    view(2);  % top-down view
-    colormap(parula);  % perceptually uniform colormap
-    colorbar;
-    axis tight;
-    xlabel(xField, 'FontWeight','bold');
-    ylabel(yField, 'FontWeight','bold');
-    title(['Heatmap of ', zField], 'FontWeight','bold');
+    % Replace zeros (or invalid points) with NaN
+    Zq(Zq == 0) = NaN;
 
-    % Overlay actual data points
+    %% plotting
+    % --- Plot heatmap using imagesc (2D) ---
+    fig = figure('Color','w', 'Name', ['Heatmap: ' zField], 'NumberTitle','off');
+    
+    % Map Zq to grid indices for imagesc and capture handle
+    hImg = imagesc(xUnique, yUnique, Zq); 
+    set(gca,'YDir','normal');  % correct y-axis direction
+    
+    % Make NaNs transparent
+    set(hImg, 'AlphaData', ~isnan(Zq));  % 1 where data exists, 0 where NaN
+    
+    % Colormap and colorbar
+    colormap(flipud(winter));
+    cb = colorbar;   % your colorbar handle is preserved
+    zField_ltx = strrep(zField, '_', '\_');
+    cb.Label.String = ['$' zField_ltx '$'];
+    cb.Label.Interpreter = 'latex';
+    cb.FontSize = 11;
+    
+    % Set color limits
+    clim([0 max(Zq(:))]);
+    
+    % Make NaNs transparent
+    set(hImg, 'AlphaData', ~isnan(Zq));  % 1 where data exists, 0 where NaN
+    
+    axis tight; axis square;
+    ax = gca;
+    set(ax, 'FontName','Times','FontSize',12,'LineWidth',1,'Box','on', 'TickLabelInterpreter','latex');
+    
+    xField_ltx = strrep(xField,'\_','\\_'); 
+    yField_ltx = strrep(yField,'\_','\\_'); 
+    xlabel(['$' xField_ltx '$'], 'Interpreter','latex', 'FontSize',14);
+    ylabel(['$' yField_ltx '$'], 'Interpreter','latex', 'FontSize',14);
+    
+    grid on; ax.GridColor=[0.7 0.7 0.7]; ax.GridAlpha=0.2;
+    ax.MinorGridAlpha=0.1; ax.XMinorGrid='on'; ax.YMinorGrid='on';
+    
     hold on;
-    hScatter = scatter(x, y, 25, 'k', '+', 'LineWidth',0.5); 
-    uistack(hScatter, 'top'); % ensure crosses are on top
+    
+    % Scatter points on top
+    hScatter = scatter(x, y, 40, [0.4 0.4 0.4], 'o', 'LineWidth',0.8);
+    
+    % Suppose you want 2 decimals on labels
+    numContours = 10;
+    levels = round(linspace(0, max(Zq(:)), numContours), 2);  % round to 2 decimals
+    
+    [C,hContour] = contour(Xq, Yq, Zq, levels, 'k', 'LineWidth', 0.5);
+    clabel(C, hContour, 'FontSize', 10, 'Color', 'k', 'Interpreter', 'latex');
+    
     hold off;
 
-    % Optional: add grid and adjust font
-    set(gca, 'FontSize', 12, 'GridColor', [0.8 0.8 0.8], 'GridAlpha', 0.3);
-    grid on;
+    % --- Tight layout ---
+    set(gca, 'LooseInset', max(get(gca,'TightInset'), 0.02));
+    
+    %% export out
+    % Define the folder two levels up + "results"
+    resultsFolder = fullfile('..','..','results/Figures_MDOPaper');
+    
+    % Make sure folder exists (optional)
+    if ~exist(resultsFolder,'dir')
+        mkdir(resultsFolder);
+    end
+    
+    % Build the filename
+    fileName = sprintf('Heatmap_%s.pdf', zField);  % no colons in filenames
+    fullPath = fullfile(resultsFolder, fileName);
+    
+    % Export
+    exportgraphics(fig, fullPath, 'ContentType','vector');
 end

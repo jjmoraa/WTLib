@@ -28,7 +28,7 @@ else
 end
 
 %% 3. Configure external tool paths (NuMAD globals)
-global ansysPath bmodesPath precompPath fastPath beamdynPath
+global ansysPath bmodesPath precompPath fastPath beamDynPath
 global crunchPath turbsimPath iecwindPath mbcPath adamsPath
 global numadPath
 
@@ -37,7 +37,7 @@ global numadPath
 ansysPath   = fullfile(designCodesDir, 'ANSYS',   'ansys.exe');
 precompPath = fullfile(designCodesDir, 'PreComp', 'PreComp.exe');
 bmodesPath  = fullfile(designCodesDir, 'BModes',  'BModes.exe');
-beamdynPath  = fullfile(designCodesDir, 'BeamDyn',  'BeamDyn_Driver_x64.exe');
+beamDynPath  = fullfile(designCodesDir, 'BeamDyn',  'BeamDyn_Driver_x64.exe');
 fastPath    = fullfile(designCodesDir, 'FAST',    'FAST.exe');
 crunchPath  = fullfile(designCodesDir, 'Crunch',  'Crunch.exe');
 turbsimPath = fullfile(designCodesDir, 'TurbSim', 'TurbSim.exe');
@@ -71,7 +71,7 @@ checkPrint = @(name, p) fprintf('%-10s: %s\n', name, ternary(~isempty(p), 'OK', 
 checkPrint('ANSYS', ansysPath);
 checkPrint('PreComp', precompPath);
 checkPrint('BModes', bmodesPath);
-checkPrint('BeamDyn', beamdynPath);
+checkPrint('BeamDyn', beamDynPath);
 checkPrint('FAST', fastPath);
 checkPrint('Crunch', crunchPath);
 checkPrint('TurbSim', turbsimPath);

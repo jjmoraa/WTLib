@@ -9,7 +9,7 @@ function dfl_c = tipdflmatch_modfalsep(refBlade, airfoils, numel, A, n, p)
     dataFolder = refBlade.dataFolder; resultsFolder = refBlade.resultsFolder;
 
     % false position algorithm parameters
-    max_iter = 100;    tolerance = 5e-1;    bounds = [90 145];
+    max_iter = 100;    tolerance = 5e-1;    bounds = [0.9*refBlade.span(end) 1.1*refBlade.span(end)];
     signcheck = true; bigger = false;    smaller = false;
 
     while and(signcheck, not(smaller*bigger))

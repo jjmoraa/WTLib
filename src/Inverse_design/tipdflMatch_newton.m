@@ -3,7 +3,7 @@ function dfl_refBlade_prop = tipdflMatch_newton(refBlade, airfoils, numel, A, n,
     % Newton's algorithm parameters
     max_iter = 100; tolerance = 5e-1; step = 1;
     
-    proposedR = 0.9 * refBlade.span(end) + refBlade.hubRad;
+    proposedR = 1 * refBlade.span(end) + refBlade.hubRad;
     materialsVec = refBlade.materialsVec; componentsVec = refBlade.componentsVec;
     blades = 3; tsr = refBlade.TSR; rated_wndspeed = refBlade.rated_windspeed;
     dataFolder = refBlade.dataFolder; resultsFolder = refBlade.resultsFolder;

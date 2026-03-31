@@ -132,6 +132,9 @@ classdef bladeParam < BladeDefmodv2
             result.rmids   = rmids;
             result.span    = span;
             result.a       = aind;
+            result.apind   = apind;
+            result.aoas    = aoas;
+            result.relwnds = relwnds;
             result.ocp     = ocp;
             result.oct     = oct;
             result.ocm     = ocm;
