@@ -1,10 +1,10 @@
-function [geometryVec, newhubRad] = jamieson_v3_tipdfl(refBlade, A, n, p, R, AoA_method)
-
+function [geometryVec, newhubRad] = jamieson_v3_momentmatch(refBlade, A, n, p, AoA_method)
+    
     %% if there's no method given for AoA selector
-        if nargin < 6 || isempty(AoA_method)
-            AoA_method = 'reference';
-        end
-       
+    if nargin < 5 || isempty(AoA_method)
+        AoA_method = 'reference';
+    end
+
     %% Implement jamiesons to get axial induction distribution
     % initialize geometry vector
     geometryVec = refBlade.geometryVec;
@@ -24,37 +24,63 @@ function [geometryVec, newhubRad] = jamieson_v3_tipdfl(refBlade, A, n, p, R, AoA
     ap = -1/2 + 1/2*sqrt(1 + 4*a.*(1-a)./(ltsr.^2));
     relwnd = atan((1-a)./((1-ap).*ltsr));
     
-    % --- Enforce radius scaling with guess radius ---
+    %% calculate parameters of interest in midpoints of spanwise elements
+    amids = length(problemSize); apmids = length(problemSize);
+    relwndmids = length(problemSize); rmids = length(problemSize); rsize = length(problemSize);
+    for i = 1:(problemSize-1)
+        amids(i)      = (a(i)+a(i+1))/2;
+        apmids(i)     = (ap(i)+ap(i+1))/2;
+        relwndmids(i) = (relwnd(i)+relwnd(i+1))/2;
+        rmids(i)      = (arefspan(i)+arefspan(i+1))/2;
+        rsize(i)      =  arefspan(i+1)-arefspan(i);
+    end
+    
+    % BEM calculations
+    cpmids = 8*amids.*((1-amids).^2).*rmids.*rsize;
+    Fmids = (2/pi)*acos(exp(-(2.5*(1-rmids))./(rmids.*sin(relwndmids))));
+    dT = Fmids.*1.225*(refBlade.rated_windspeed^2)*4.*amids.*(1-amids)*pi.*rmids.*rsize;
+    
+    %% get integrated quantities from AD
+    % integrated quantities from actuator disk
+    thrust = sum(dT(2:end));
+    cntrThr=sum((dT.*rmids)/sum(dT));%center of thrust
+    oopmoment=cntrThr*thrust;
+    
+    % moment coefficient
+    ocm=oopmoment/((1/2)*1.225*pi()*(1^3)*(refBlade.rated_windspeed^2));
+    
+    %% radius determination and hub scaling
+    R=((refBlade.operating_point.moment)/(0.5*1.225*(refBlade.rated_windspeed^2)*pi()*ocm))^(1/3);
     newhubRad=refBlade.hubRad*R/refR;
     span=arefspan*R;
-
-    %% determine AoA for span using prescribed method
-        if strcmp(AoA_method, 'reference')
-            % Original
-            y_old = refBlade.operating_point.aoas;   n_old = length(y_old);
-            
-            % New size
-            n_new = length(span);
-            
-            % Normalized coordinate (0 → 1)
-            s_old = linspace(0,1,n_old);
-            s_new = linspace(0,1,n_new);
-            
-            % Resample (shape-preserving)
-            aoa = interp1(s_old, y_old, s_new, 'pchip')';
-        else
-            aoa = determineAoA(span, refBlade.dataFolder, AoA_method);
     
-            % Convert AoA to degrees
-            aoa_deg = rad2deg(aoa);
-            
-            % Smooth in degrees
-            aoa_deg_smooth = movmean(aoa_deg, 7);
-            
-            % Convert back to radians
-            aoa = deg2rad(aoa_deg_smooth);
-        end
+    %% determine AoA for span using prescribed method
+    if strcmp(AoA_method, 'reference')
+        % Original
+        y_old = refBlade.operating_point.aoas;   n_old = length(y_old);
+        
+        % New size
+        n_new = length(span);
+        
+        % Normalized coordinate (0 → 1)
+        s_old = linspace(0,1,n_old);
+        s_new = linspace(0,1,n_new);
+        
+        % Resample (shape-preserving)
+        aoa = interp1(s_old, y_old, s_new, 'pchip')';
+        aoa (end) = aoa (end - 1);
+    else
+        aoa = determineAoA(span, refBlade.dataFolder, AoA_method);
 
+        % Convert AoA to degrees
+        aoa_deg = rad2deg(aoa);
+        
+        % Smooth in degrees
+        aoa_deg_smooth = movmean(aoa_deg, 7);
+        
+        % Convert back to radians
+        aoa = deg2rad(aoa_deg_smooth);
+    end
     %% ------------------- Precompute: map span → airfoil -------------------
 
     refSpan   = refBlade.geometryVec.span;
@@ -93,10 +119,11 @@ function [geometryVec, newhubRad] = jamieson_v3_tipdfl(refBlade, A, n, p, R, AoA
         tables{k}.cd    = table.cd;
     end
     
-%% ------------------- Interpolate Cl/Cd and compute chord -------------------
+    %% ------------------- Interpolate Cl/Cd and compute chord -------------------
     cl   = zeros(size(arefspan));
     cd   = zeros(size(arefspan));
     chord = zeros(size(arefspan));
+    F = zeros(size(arefspan));
     
     aoa = rad2deg(aoa); %tables will be in degrees
     for j = 1:length(arefspan)
@@ -106,9 +133,12 @@ function [geometryVec, newhubRad] = jamieson_v3_tipdfl(refBlade, A, n, p, R, AoA
         % Interpolate Cl/Cd using smoothed AoA
         cl(j) = interp1(table.alpha, table.cl, aoa(j), 'pchip');
         cd(j) = interp1(table.alpha, table.cd, aoa(j), 'pchip');
-    
+        
+        F(j)=(2/pi)*acos(exp(-(2.5*(1-arefspan(j)/arefspan(end)))/...
+            (arefspan(j)*sin(relwnd(j))/arefspan(end))));
+
         % Chord from BEM relation
-        chord(j) = 8 * sin(relwnd(j)) * a(j) * pi * span(j) / ...
+        chord(j) = 8 * sin(relwnd(j)) * a(j) * F(j) * pi * span(j) / ...
                    (refBlade.Blades * cl(j) * ltsr(j) * (1 + ap(j)));
     end
     
@@ -116,17 +146,16 @@ function [geometryVec, newhubRad] = jamieson_v3_tipdfl(refBlade, A, n, p, R, AoA
     chord(chord < refBlade.ichord(end)) = refBlade.ichord(end);
     twist = relwnd*180/pi() - aoa;
     twist(1:(frozenPoints+1)) = refBlade.idegreestwist(1:(frozenPoints+1));
-    
-    % twist misbehaving, smooth only tip region
-    pct = 0.1;
-    n = length(twist);
-    
-    nTip = max(3, ceil(pct * n));
-    idx = (n - nTip + 1):n;
-    
-    % twist(idx) = movmean(twist(idx), 3);  % small window, not n
+    % twist(end) = twist (end - 1);
 
     geometryVec.span = span - newhubRad; geometryVec.span(1) = 0;
     geometryVec.degreestwist = twist;
     geometryVec.chord = chord;
+    % geometryVec.afID = airfoilno;
+    % geometryVec.chordoffset = [geometryVec.chordoffset geometryVec.chordoffset(end)];
+    % geometryVec.sweep = [geometryVec.sweep, geometryVec.sweep(end)];
+    % geometryVec.prebend = [geometryVec.prebend, geometryVec.prebend(end)];
+    % geometryVec.percentthick = [geometryVec.percentthick, geometryVec.percentthick(end)];
+    % geometryVec.aerocenter = [geometryVec.aerocenter, geometryVec.aerocenter(end)];
+
 end

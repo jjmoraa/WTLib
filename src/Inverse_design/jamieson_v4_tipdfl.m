@@ -42,6 +42,7 @@ function [geometryVec, newhubRad] = jamieson_v3_tipdfl(refBlade, A, n, p, R, AoA
             
             % Resample (shape-preserving)
             aoa = interp1(s_old, y_old, s_new, 'pchip')';
+            aoa (end) = aoa (end - 1);
         else
             aoa = determineAoA(span, refBlade.dataFolder, AoA_method);
     
@@ -97,6 +98,7 @@ function [geometryVec, newhubRad] = jamieson_v3_tipdfl(refBlade, A, n, p, R, AoA
     cl   = zeros(size(arefspan));
     cd   = zeros(size(arefspan));
     chord = zeros(size(arefspan));
+    F = zeros(size(arefspan));
     
     aoa = rad2deg(aoa); %tables will be in degrees
     for j = 1:length(arefspan)
@@ -107,8 +109,11 @@ function [geometryVec, newhubRad] = jamieson_v3_tipdfl(refBlade, A, n, p, R, AoA
         cl(j) = interp1(table.alpha, table.cl, aoa(j), 'pchip');
         cd(j) = interp1(table.alpha, table.cd, aoa(j), 'pchip');
     
+        F(j)=(2/pi)*acos(exp(-(2.5*(1-arefspan(j)/arefspan(end)))/...
+            (arefspan(j)*sin(relwnd(j))/arefspan(end))));
+
         % Chord from BEM relation
-        chord(j) = 8 * sin(relwnd(j)) * a(j) * pi * span(j) / ...
+        chord(j) = 8 * sin(relwnd(j)) * a(j) * F(j) * pi * span(j) / ...
                    (refBlade.Blades * cl(j) * ltsr(j) * (1 + ap(j)));
     end
     
@@ -116,6 +121,7 @@ function [geometryVec, newhubRad] = jamieson_v3_tipdfl(refBlade, A, n, p, R, AoA
     chord(chord < refBlade.ichord(end)) = refBlade.ichord(end);
     twist = relwnd*180/pi() - aoa;
     twist(1:(frozenPoints+1)) = refBlade.idegreestwist(1:(frozenPoints+1));
+    % twist(end) = twist (end - 1);
     
     % twist misbehaving, smooth only tip region
     pct = 0.1;
