@@ -68,18 +68,18 @@ function [geometryVec, newhubRad] = jamieson_v3_momentmatch(refBlade, A, n, p, A
         
         % Resample (shape-preserving)
         aoa = interp1(s_old, y_old, s_new, 'pchip')';
-        aoa (end) = aoa (end - 1);
+        % aoa (end) = aoa (end - 1);
     else
-        aoa = determineAoA(span, refBlade.dataFolder, AoA_method);
+        aoa = determineAoA(span, refBlade.dataFolder, AoA_method, refBlade);
 
         % Convert AoA to degrees
-        aoa_deg = rad2deg(aoa);
+        % aoa_deg = rad2deg(aoa);
         
         % Smooth in degrees
-        aoa_deg_smooth = movmean(aoa_deg, 7);
+        % aoa_deg_smooth = movmean(aoa_deg, 7);
         
         % Convert back to radians
-        aoa = deg2rad(aoa_deg_smooth);
+        % aoa = deg2rad(aoa);
     end
     %% ------------------- Precompute: map span → airfoil -------------------
 

@@ -1,5 +1,10 @@
-function dfl_refBlade_prop = tipdflMatch_newton(refBlade, airfoils, numel, A, n, p)
+function dfl_refBlade_prop = tipdflMatch_newton(refBlade, airfoils, numel, A, n, p, AoA_method)
     
+    %% if there's no method given for AoA selector
+        if nargin < 7 || isempty(AoA_method)
+            AoA_method = 'reference';
+        end
+
     % Newton's algorithm parameters
     max_iter = 100; tolerance = 5e-1; step = 1;
     
@@ -11,7 +16,7 @@ function dfl_refBlade_prop = tipdflMatch_newton(refBlade, airfoils, numel, A, n,
     iter = 0; target_dfl = refBlade.operating_point.deflection(1,end);
     while iter < max_iter
         iter = iter + 1;
-        [geometryVec_dfl, hubRad_dfl] = jamieson_v4_tipdfl(refBlade, A, n, p, proposedR);
+        [geometryVec_dfl, hubRad_dfl] = jamieson_v4_tipdfl(refBlade, A, n, p, proposedR, AoA_method);
 
         % center point
         dfl_refBlade_prop = bladeParam(geometryVec_dfl, materialsVec, componentsVec,...
@@ -21,7 +26,7 @@ function dfl_refBlade_prop = tipdflMatch_newton(refBlade, airfoils, numel, A, n,
         dfl_refBlade_prop.operatingPoint; dfl_center = dfl_refBlade_prop.operating_point.deflection(1,end);
 
         % + step
-        [geometryVec_dfl, hubRad_dfl] = jamieson_v4_tipdfl(refBlade, A, n, p, proposedR + step);
+        [geometryVec_dfl, hubRad_dfl] = jamieson_v4_tipdfl(refBlade, A, n, p, proposedR + step, AoA_method);
         dfl_refBlade = bladeParam(geometryVec_dfl, materialsVec, componentsVec,...
                 hubRad_dfl, blades, tsr, rated_wndspeed, dataFolder, resultsFolder, airfoils, numel);
 
@@ -30,7 +35,7 @@ function dfl_refBlade_prop = tipdflMatch_newton(refBlade, airfoils, numel, A, n,
 
 
         % - step
-        [geometryVec_dfl, hubRad_dfl] = jamieson_v4_tipdfl(refBlade, A, n, p, proposedR - step);
+        [geometryVec_dfl, hubRad_dfl] = jamieson_v4_tipdfl(refBlade, A, n, p, proposedR - step, AoA_method);
         dfl_refBlade = bladeParam(geometryVec_dfl, materialsVec, componentsVec,...
                 hubRad_dfl, blades, tsr, rated_wndspeed, dataFolder, resultsFolder, airfoils, numel);
 
