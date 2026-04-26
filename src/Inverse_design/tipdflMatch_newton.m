@@ -27,20 +27,20 @@ function dfl_refBlade_prop = tipdflMatch_newton(refBlade, airfoils, numel, A, n,
 
         % + step
         [geometryVec_dfl, hubRad_dfl] = jamieson_v4_tipdfl(refBlade, A, n, p, proposedR + step, AoA_method);
-        dfl_refBlade = bladeParam(geometryVec_dfl, materialsVec, componentsVec,...
+        dfl_refBlade_plus = bladeParam(geometryVec_dfl, materialsVec, componentsVec,...
                 hubRad_dfl, blades, tsr, rated_wndspeed, dataFolder, resultsFolder, airfoils, numel);
 
-        dfl_refBlade.showName; dfl_refBlade.updateBlade; dfl_refBlade.generateBeamModel; 
-        dfl_refBlade.operatingPoint; dfl_plus = dfl_refBlade.operating_point.deflection(1,end);
+        dfl_refBlade_plus.showName; dfl_refBlade_plus.updateBlade; dfl_refBlade_plus.generateBeamModel; 
+        dfl_refBlade_plus.operatingPoint; dfl_plus = dfl_refBlade_plus.operating_point.deflection(1,end);
 
 
         % - step
         [geometryVec_dfl, hubRad_dfl] = jamieson_v4_tipdfl(refBlade, A, n, p, proposedR - step, AoA_method);
-        dfl_refBlade = bladeParam(geometryVec_dfl, materialsVec, componentsVec,...
+        dfl_refBlade_min = bladeParam(geometryVec_dfl, materialsVec, componentsVec,...
                 hubRad_dfl, blades, tsr, rated_wndspeed, dataFolder, resultsFolder, airfoils, numel);
 
-        dfl_refBlade.showName; dfl_refBlade.updateBlade; dfl_refBlade.generateBeamModel; 
-        dfl_refBlade.operatingPoint; dfl_minus = dfl_refBlade.operating_point.deflection(1,end);
+        dfl_refBlade_min.showName; dfl_refBlade_min.updateBlade; dfl_refBlade_min.generateBeamModel; 
+        dfl_refBlade_min.operatingPoint; dfl_minus = dfl_refBlade_min.operating_point.deflection(1,end);
 
         % diff and update proposedR
         dflprime = (dfl_plus - dfl_minus) / (2 * step);

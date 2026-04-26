@@ -12,8 +12,15 @@ function mom_blade = momMatch_wrapper(refBlade, airfoils, numel, A, n, p)
     mom_blade = bladeParam(geometryVec_mommat, materialsVec, componentsVec,...
                 hubRad_mommat, blades, tsr, rated_wndspeed, dataFolder, resultsFolder, airfoils, numel);
     
+    % --- chord sanity check ---
+    if any([geometryVec_mommat.chord] < 0)
+        return
+    end
+
     % --- Run calculations ---
-    mom_blade.updateBlade; mom_blade.generateBeamModel; 
-    mom_blade.showName; mom_blade.operatingPoint;
+    mom_blade.updateBlade; 
+    mom_blade.generateBeamModel; 
+    mom_blade.showName; 
+    mom_blade.operatingPoint;
 
 end

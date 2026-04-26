@@ -1,4 +1,4 @@
-function [amids,apmids,cpmids,ctmids,cmmids,ocp,oct,ocm,dT,dQ,totalpwr,oopmoment,rsize,rmids]=AD_performance(chordVector,relwnds,aind,apind,aoas,Fs,cls,cds,cpvector,wndspeed,ltsr,R,span)
+function [amids,apmids,cpmids,ctmids,cmmids,aeq,ocp,oct,ocm,dT,dQ,totalpwr,oopmoment,rsize,rmids]=AD_performance(chordVector,relwnds,aind,apind,aoas,Fs,cls,cds,cpvector,wndspeed,ltsr,R,span)
 
 %ask this to lackner
 aind(end)=0;
@@ -68,4 +68,7 @@ oopmoment=cntrThr*thrust;
 ocp=totalpwr/((1/2)*1.225*pi()*(R^2)*(wndspeed^3));
 oct=thrust/((1/2)*1.225*pi()*(R^2)*(wndspeed^2));
 ocm=oopmoment/((1/2)*1.225*pi()*(R^3)*(wndspeed^2));
+
+% recover global axial induction
+aeq = 1/2 * (1 - sqrt(1 - oct));
 % also with more discretization dpower will converge to a more accurate value

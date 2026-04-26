@@ -1,4 +1,4 @@
-function bladeComparison(blades, labels)
+function [fig, tlo] = bladeComparison(blades, labels)
 %% bladeComparison
 % Compare multiple blades (cell array of blade objects)
 

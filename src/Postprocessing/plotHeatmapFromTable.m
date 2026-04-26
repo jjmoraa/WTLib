@@ -71,17 +71,17 @@ function [fig, hImg, hScatter, hContour, C] = plotHeatmapFromTable(dataTable, xF
     
     %% export out
     % Define the folder two levels up + "results"
-    resultsFolder = fullfile('..','..','results/Figures_MDOPaper');
-    
-    % Make sure folder exists (optional)
-    if ~exist(resultsFolder,'dir')
-        mkdir(resultsFolder);
-    end
-    
-    % Build the filename
-    fileName = sprintf('Heatmap_%s.pdf', zField);  % no colons in filenames
-    fullPath = fullfile(resultsFolder, fileName);
-    
-    % Export
-    exportgraphics(fig, fullPath, 'ContentType','vector');
+    % resultsFolder = fullfile('..','..','results/Figures_MDOPaper');
+    % 
+    % % Make sure folder exists (optional)
+    % if ~exist(resultsFolder,'dir')
+    %     mkdir(resultsFolder);
+    % end
+    % 
+    % % Build the filename
+    % fileName = sprintf('Heatmap_%s.pdf', zField);  % no colons in filenames
+    % fullPath = fullfile(resultsFolder, fileName);
+    % 
+    % % Export
+    % exportgraphics(fig, fullPath, 'ContentType','vector');
 end

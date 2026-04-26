@@ -119,7 +119,7 @@ classdef bladeParam < BladeDefmodv2
             % variables it prints
             % [amids,apmids,cpmids,ctmids,cmmids,ocp,oct,...
             % ocm,dT,dQ,totalpwr,oopmoment,rsize,rmids]
-            [~,~,~,~,~,ocp,oct,ocm,dT,dQ,totalpwr,moment,rsize,rmids] = ...
+            [~,~,~,~,~,aeq,ocp,oct,ocm,dT,dQ,totalpwr,moment,rsize,rmids] = ...
                 AD_performance(chordVector,relwnds,aind,apind,aoas,Fs,cls,cds,...
                                cpvector,wndspeed,ltsrvect,R,span);
         
@@ -135,9 +135,13 @@ classdef bladeParam < BladeDefmodv2
             result.apind   = apind;
             result.aoas    = aoas;
             result.relwnds = relwnds;
+            result.aeq     = aeq;
             result.ocp     = ocp;
             result.oct     = oct;
             result.ocm     = ocm;
+            result.cp_vector     = cpvector;
+            result.ct_vector     = ctvector;
+            result.cm_vector     = cmvector;
         end
         
         function getMass(obj)
@@ -146,7 +150,7 @@ classdef bladeParam < BladeDefmodv2
         function operating_point = operatingPoint(obj)            
             
             result = runBEMPoint(obj, obj.rated_windspeed);
-            [status, cmdout, beamDynOutput] = beamDynAnalysis(obj, result.dT);
+            [status, cmdout, beamDynOutput, x_bar] = beamDynAnalysis(obj, result.dT);
             
             % Extract tip deflections
                 xDeflection = beamDynOutput(:, ...
@@ -157,9 +161,16 @@ classdef bladeParam < BladeDefmodv2
                     startsWith(beamDynOutput.Properties.VariableNames, 'N') & ...
                     endsWith(beamDynOutput.Properties.VariableNames, '_TDyr'));
                 
+                zDeflection = beamDynOutput(:, ...
+                    startsWith(beamDynOutput.Properties.VariableNames, 'N') & ...
+                    endsWith(beamDynOutput.Properties.VariableNames, '_TDzr'));
+
                 D(1,:) = table2array(xDeflection(end,:));
                 D(2,:) = table2array(yDeflection(end,:));
-            result.deflection = D;
+                D(3,:) = table2array(zDeflection(end,:));
+            result.deflection = D; result.x_bar = x_bar;
+            result.bd_beamDynOutput = beamDynOutput;
+            result.bd_cmdout = cmdout;
             obj.operating_point = result;
         end
 
@@ -191,46 +202,58 @@ classdef bladeParam < BladeDefmodv2
             fprintf('The variable name is: %s\n', obj.varName);
         end
 
-        function [status, cmdout, beamDynOutput] = beamDynAnalysis(obj, dT, mu_values)
-            %BEAMDYNANALYSIS Generate BeamDyn input and run simulation
-            %   Inputs:
-            %       dT        - distributed loads along the blade
-            %       mu_values - optional, distributed mass values (default: 0.1*ones(1,6))
-            %
-            %   Outputs:
-            %       status - BeamDyn exit code
-            %       cmdout - captured command output
-
-            % --- Add BeamDyn path ---
+         function [status, cmdout, beamDynOutput, x_bar] = beamDynAnalysis(obj,dT,mu_values)
+        
             beamDynPath = addBeamDynPath();
         
-            % --- Set default mu_values if not provided ---
             if nargin < 3 || isempty(mu_values)
-                mu_values = 0.001 * ones(1,6);
+                mu_values = 0.1*ones(1,6);
             end
         
-            output_filename = obj.varName;  % default to object's name
-            % --- Extract folder and base name ---
-            [outputDir, baseName, ext] = fileparts(output_filename);
-            if isempty(outputDir)
-                outputDir = obj.resultsFolder;   % default to current folder
-            end
-            output_filename = fullfile(outputDir, baseName);  % ensure no extension added
+            beamDynOutput = [];
         
-            % --- Generate input file ---
-            generate_beamdyn_input(obj, mu_values, output_filename, dT);
+            % save old folder
+            oldFolder = pwd;
         
-            % --- Run BeamDyn simulation ---
-            [status, cmdout] = run_beamdyn(beamDynPath, baseName, outputDir);
-
-            % --- Check for convergence ---
-            if contains(cmdout, 'BD_Static:Solution does not converge')
-                disp('BeamDyn static solution failed to converge.');
-                D = [];  % optionally return empty if failed
-            else
-                % Read BeamDyn output
-                beamDynOutput = read_BeamDyn_out(fullfile(outputDir, baseName));                              
+            % unique run folder
+            runFolder = fullfile(tempdir, ...
+                ['BeamDyn_' char(java.util.UUID.randomUUID)]);
+            mkdir(runFolder);
+        
+            % move into worker folder
+            cd(runFolder);
+        
+            try
+        
+                baseName = obj.varName;
+                output_filename = fullfile(runFolder, baseName);
+        
+                % write inputs
+                x_bar = generate_beamdyn_input(obj,mu_values,output_filename,dT);
+        
+                % run BeamDyn
+                [status, cmdout] = run_beamdyn(beamDynPath,baseName,runFolder);
+        
+                % read outputs
+                if contains(cmdout,'BD_Static:Solution does not converge')
+                    beamDynOutput = [];
+                else
+                    beamDynOutput = read_BeamDyn_out(fullfile(runFolder,baseName));
+                end
+        
+            catch ME
+        
+                %% always restore folder first
+                cd(oldFolder);
+                rmdir(runFolder,'s');
+                rethrow(ME)
+        
             end
+        
+            %% normal cleanup
+            cd(oldFolder);
+            rmdir(runFolder,'s');
+        
         end
         
         function analyze(obj)

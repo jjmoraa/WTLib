@@ -1,4 +1,4 @@
-function generate_beamdyn_input(blade, mu_values, output_filename, dT)
+function x_bar = generate_beamdyn_input(blade, mu_values, output_filename, dT)
 % Generates a BeamDyn blade properties input file based on PreComp outputs
 % Inputs:
 % - precomp_data: A 2D array of dimensions (span_sections x 23), where each row
@@ -61,10 +61,10 @@ center_points = (spanwise_positions(1:end-1) + spanwise_positions(2:end)) / 2;
 
     BeamDyn_primary_file(output_filename, length(spanwise_positions)-1, length(spanwise_positions), key_points, 5)
 
-    BeamDyn_driver_file(dcm, center_points, dT, length(spanwise_positions)-1, output_filename)
+    x_bar = BeamDyn_driver_file(dcm, center_points, dT, length(spanwise_positions)-1, output_filename);
 end
 
-function BeamDyn_driver_file(dcm, eta, dT, num_elements, output_filename)
+function x_bar = BeamDyn_driver_file(dcm, eta, dT, num_elements, output_filename)
 % Generates a BeamDyn driver input file based on distributed point loads
 % Inputs:
 % - dT: A vector containing point loads distributed across elements.
@@ -206,9 +206,9 @@ try
     fprintf(fid, '          2   quadrature       - Quadrature method: 1=Gaussian; 2=Trapezoidal (switch)\n');
     fprintf(fid, '          1   refine           - Refinement factor for trapezoidal quadrature (-) [DEFAULT = 1; used only when quadrature=2]\n');
     fprintf(fid, '"DEFAULT"     n_fact           - Factorization frequency for the Jacobian in N-R iteration(-) [DEFAULT = 5]\n');
-    fprintf(fid, '0.002     DTBeam           - Time step size (s)\n');
+    fprintf(fid, '0.001     DTBeam           - Time step size (s)\n');
     fprintf(fid, '"DEFAULT"     load_retries     - Number of factored load retries before quitting the simulation [DEFAULT = 20]\n');
-    fprintf(fid, '1000          NRMax            - Max number of iterations in Newton-Raphson algorithm (-) [DEFAULT = 10]\n');
+    fprintf(fid, '2000          NRMax            - Max number of iterations in Newton-Raphson algorithm (-) [DEFAULT = 10]\n');
     fprintf(fid, '"DEFAULT"     stop_tol         - Tolerance for stopping criterion (-) [DEFAULT = 1E-5]\n');
     fprintf(fid, '"DEFAULT"     tngt_stf_fd      - Use finite differenced tangent stiffness matrix? (flag)\n');
     fprintf(fid, '"DEFAULT"     tngt_stf_comp    - Compare analytical finite differenced tangent stiffness matrix? (flag)\n');

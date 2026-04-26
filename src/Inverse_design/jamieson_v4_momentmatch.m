@@ -143,10 +143,22 @@ function [geometryVec, newhubRad] = jamieson_v3_momentmatch(refBlade, A, n, p, A
     end
     
     chord(1:(frozenPoints+1)) = refBlade.ichord(1:(frozenPoints+1))*(chord(frozenPoints+1)/refBlade.ichord(frozenPoints+1));
-    chord(chord < refBlade.ichord(end)) = refBlade.ichord(end);
+    
+    % chord correction
+    chord_min = refBlade.geometryVec.chord(end);   % minimum allowable chord
+
+    if any(chord(1:end - 1) < chord_min)
+        chord(end) = chord(end - 1);
+    else
+        chord(end) = chord_min;
+    end
+
+
+
     twist = relwnd*180/pi() - aoa;
-    twist(1:(frozenPoints+1)) = refBlade.idegreestwist(1:(frozenPoints+1));
-    % twist(end) = twist (end - 1);
+    twist_scale = refBlade.idegreestwist(frozenPoints+1) / twist(frozenPoints+1);     % Compute scaling factor
+    twist(1:(frozenPoints+1)) = refBlade.idegreestwist(1:(frozenPoints+1)) * twist_scale;
+    twist(end) = twist (end - 1);
 
     geometryVec.span = span - newhubRad; geometryVec.span(1) = 0;
     geometryVec.degreestwist = twist;
