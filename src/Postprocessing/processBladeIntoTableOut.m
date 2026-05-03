@@ -5,7 +5,7 @@ function out = processBladeIntoTableOut(blade, n, p)
         return
     end
 
-    blade.operatingPoint
+   % blade.operatingPoint
 
     cp = blade.operating_point.ocp;
     cm = blade.operating_point.ocm;

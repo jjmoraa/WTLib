@@ -13,7 +13,7 @@ function [fig, hImg, hScatter, hContour, C] = plotHeatmapFromTable(dataTable, xF
     Zq = griddata(x, y, z, Xq, Yq, 'natural');  % smooth transitions
 
     % Replace zeros (or invalid points) with NaN
-    Zq(Zq == 0) = NaN;
+    % Zq(Zq == 0) = NaN;
 
     %% plotting
     % --- Plot heatmap using imagesc (2D) ---
@@ -35,7 +35,7 @@ function [fig, hImg, hScatter, hContour, C] = plotHeatmapFromTable(dataTable, xF
     cb.FontSize = 11;
     
     % Set color limits
-    clim([0 max(Zq(:))]);
+    clim([min(Zq(:)) max(Zq(:))]);
     
     % Make NaNs transparent
     set(hImg, 'AlphaData', ~isnan(Zq));  % 1 where data exists, 0 where NaN

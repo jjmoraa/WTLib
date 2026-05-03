@@ -16,13 +16,22 @@ if numel(mu_values) ~= 6
 end
 
 spanwise_positions=precomp_data(:,1,:);
+for i=1:length(spanwise_positions)
+    % estimation of area and inertia using method similar to WISDEM
+    E_est_xx(i) = precomp_data(i,5) ./ precomp_data(i,20);
+    E_est_yy(i) = precomp_data(i,4) ./ precomp_data(i,19);
+    A_est_xx(i) = precomp_data(i,7) ./E_est_xx(i);
+    A_est_yy(i) = precomp_data(i,7) ./E_est_yy(i);
+    G_est(i)    = precomp_data(i,6) ./(precomp_data(i,20) + precomp_data(i,19));
+end
+
 % calculate the matrices
 stiffness_matrix=zeros(size(precomp_data,1),6,6);
 mass_matrix=zeros(size(precomp_data,1),6,6);
 for i=1:length(spanwise_positions)
     %stiffness matrix build
-    stiffness_matrix(i,1,1)=precomp_data(i,5)*1*(10^0);%test dummy value
-    stiffness_matrix(i,2,2)=precomp_data(i,5)*1*(10^0);%test dummy value
+    stiffness_matrix(i,1,1)=G_est(i) * A_est_yy(i);
+    stiffness_matrix(i,2,2)=G_est(i) * A_est_xx(i);
     stiffness_matrix(i,3,3)=precomp_data(i,7);%EA
     stiffness_matrix(i,4,4)=precomp_data(i,4);%EI_edge
     stiffness_matrix(i,5,5)=precomp_data(i,5);%EI_flap
@@ -35,7 +44,7 @@ for i=1:length(spanwise_positions)
     mass_matrix(i,3,3)=precomp_data(i,18);%mass per unit span
     mass_matrix(i,4,4)=precomp_data(i,20);%edge inertia
     mass_matrix(i,5,5)=precomp_data(i,19);%flap inertia
-    mass_matrix(i,6,6)=precomp_data(i,20)+precomp_data(i,19);%polar inertia (edge + flap)
+    mass_matrix(i,6,6)=precomp_data(i,20) + precomp_data(i,19);%polar inertia (edge + flap)
     %non diagonal components
     %upper triag
     mass_matrix(i,4,3)=precomp_data(i,18)*precomp_data(i,23);%mass per unit span * y center of mass
@@ -99,10 +108,10 @@ try
     fprintf(fid, '------- BEAMDYN Driver with OpenFAST INPUT FILE --------------------------------\n');
     fprintf(fid, 'Static analysis of a twisted beam\n');
     fprintf(fid, '---------------------- SIMULATION CONTROL --------------------------------------\n');
-    fprintf(fid, 'False         DynamicSolve  - Dynamic solve (false for static solve) (-)\n');
+    fprintf(fid, 'True         DynamicSolve  - Dynamic solve (false for static solve) (-)\n');
     fprintf(fid, '          0   t_initial     - Starting time of simulation (s) [used only when DynamicSolve=TRUE]\n');
-    fprintf(fid, '         30   t_final       - Ending time of simulation   (s) [used only when DynamicSolve=TRUE]\n');
-    fprintf(fid, '       0.01   dt            - Time increment size         (s) [used only when DynamicSolve=TRUE]\n');
+    fprintf(fid, '         1000   t_final       - Ending time of simulation   (s) [used only when DynamicSolve=TRUE]\n');
+    fprintf(fid, '       0.1   dt            - Time increment size         (s) [used only when DynamicSolve=TRUE]\n');
     fprintf(fid, '---------------------- GRAVITY PARAMETER --------------------------------------\n');
     %fprintf(fid, '      9.806   Gx            - Component of gravity vector along X direction (m/s^2)\n');
     fprintf(fid, '          0   Gx            - Component of gravity vector along X direction (m/s^2)\n');

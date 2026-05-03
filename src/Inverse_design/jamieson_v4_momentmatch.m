@@ -142,8 +142,12 @@ function [geometryVec, newhubRad] = jamieson_v3_momentmatch(refBlade, A, n, p, A
                    (refBlade.Blades * cl(j) * ltsr(j) * (1 + ap(j)));
     end
     
-    chord(1:(frozenPoints+1)) = refBlade.ichord(1:(frozenPoints+1))*(chord(frozenPoints+1)/refBlade.ichord(frozenPoints+1));
+    %chord(1:(frozenPoints+1)) = refBlade.ichord(1:(frozenPoints+1))*(chord(frozenPoints+1)/refBlade.ichord(frozenPoints+1));
     
+    chord_scale = chord(frozenPoints + 1) / refBlade.chord(frozenPoints + 1);     % Compute scaling factor
+    chord_scale_fun =1 + (chord_scale - 1) * (1:(frozenPoints + 1)) / (frozenPoints + 1);
+    chord(1:((frozenPoints + 1))) = refBlade.chord(1:(frozenPoints + 1)) .* chord_scale_fun';
+
     % chord correction
     chord_min = refBlade.geometryVec.chord(end);   % minimum allowable chord
 
@@ -156,8 +160,9 @@ function [geometryVec, newhubRad] = jamieson_v3_momentmatch(refBlade, A, n, p, A
 
 
     twist = relwnd*180/pi() - aoa;
-    twist_scale = refBlade.idegreestwist(frozenPoints+1) / twist(frozenPoints+1);     % Compute scaling factor
-    twist(1:(frozenPoints+1)) = refBlade.idegreestwist(1:(frozenPoints+1)) * twist_scale;
+    twist_scale = twist(frozenPoints + 1) / refBlade.degreestwist(frozenPoints + 1);     % Compute scaling factor
+    twist_scale_fun =1 + (twist_scale - 1) * (1:(frozenPoints + 1)) / (frozenPoints + 1);
+    twist(1:((frozenPoints + 1))) = refBlade.degreestwist(1:(frozenPoints + 1)) .* twist_scale_fun';
     twist(end) = twist (end - 1);
 
     geometryVec.span = span - newhubRad; geometryVec.span(1) = 0;
