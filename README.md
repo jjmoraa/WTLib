@@ -291,6 +291,23 @@ Specify your license here (e.g., MIT License, BSD, etc.)
 
 ---
 
+## Citation
+
+If you use WTLib in your research, please cite it as:
+
+> Mora, J.; Lackner, M. (2026). *WTLib: A Matlab toolbox for wind turbine analysis and simulation*. GitHub repository. https://github.com/jjmoraa/WTLib
+
+BibTeX:
+
+```bibtex
+@misc{mora2026wtlib,
+  author       = {Jose Mora},
+  title        = {{WTLib}: A Matlab toolbox for wind turbine analysis and simulation},
+  year         = {2026},
+  howpublished = {\url{https://github.com/jjmoraa/WTLib}},
+  note         = {GitHub repository}
+}
+
 ## Contact
 
 For questions or collaboration inquiries, please open an issue on GitHub or contact the author.
